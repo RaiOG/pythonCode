@@ -1,0 +1,45 @@
+import pandas as pd
+from yahooquery import Ticker
+
+
+## From quote_type we get: shortName, exchange, 
+## From asset_profile we get: sector
+
+listtype = [] 
+listIndustry = [] 
+listlongName = []
+listExchange = []
+listSymbol = []
+
+readExcel = pd.DataFrame()
+readExcel = pd.read_excel(r'YOU'RE SUPPOSED TO FILL THE PROGRAM WITH A SPREADSHEET WHICH CONTAINS A LIST OF STOCKS (OR ETFS, or whatever)')
+
+listaATIVOS = readExcel['REITS USA'].tolist() #I originally did this script using my native language. "Lista" means list
+
+
+for a in listaATIVOS: # here I'm basically saying: for all elements in the list listaATIVOS, do /THAT/
+    try:
+        print(a, end=' ')
+        ativo = Ticker(a)
+        ativoInfo = ativo.asset_profile[a]
+        try:
+            listatype.append(ativoInfo['industry'])
+            listaIndustry.append(ativoInfo['sector'])
+        except TypeError:
+            listatype.append('Sem info')
+            listaIndustry.append('Sem info')
+        ativoInfo = ativo.quote_type[a]
+        try:
+            listaSymbol.append(ativoInfo['symbol'])
+            listalongName.append(ativoInfo['longName'])
+            listaExchange.append(ativoInfo['exchange'])
+        except TypeError:
+            listalongName.append('Sem info')
+            listaExchange.append('Sem info')
+    except TypeError:
+        print('Lista finalizada ou dados não encontrados. Encerrando programa')
+        break
+
+df = pd.DataFrame(list(zip(listaSymbol, listatype, listaIndustry, listalongName, listaExchange)), 
+                  columns =['ticker','industry', 'sector', 'longName', 'exchange'])
+df.to_excel(r'C:\Users\Rai\Downloads\Quarentena\Planilhas\Freelance\listaNASDAQ.xls')
